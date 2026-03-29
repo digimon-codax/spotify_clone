@@ -56,6 +56,8 @@ async function loginUser(req, res){
             {email}
         ]
     })
+
+    const isPasswordValid = await bcrypt.compare(password, user.password)
 }
 
 module.exports = {registerUser}
