@@ -2,6 +2,7 @@ const musicModel = require("../models/music.model")
 const {uploadFile} = require("../services/storage.service")
 const jwt = require("jsonwebtoken")
 
+
 async function createMusic(req, res){
 
     const token = req.cookies.token
@@ -19,31 +20,32 @@ async function createMusic(req, res){
                 message: "you don't have access to create a music"
             })
         }
+    
+        const {title} = req.body
+        const uri = req.file.path
+
+        const result = await uploadFile(file.buffer.toString("base64"))
+
+        const music = await musicModel.create({
+            title,
+            uri: result.url,
+            artist: decoded.id
+        })
+
+        res.status(201).json({
+            message: "music created successfully",
+            music:{
+                title: music.title,
+                uri: music.uri,
+                artist: music.artist
+            }
+        })
     }
     catch(err){
         return res.status(401).json({
             message: "unauthorized"
         })
     }
-    const {title} = req.body
-    const uri = req.file.path
-
-    const result = await uploadFile(file.buffer.toString("base64"))
-
-    const music = await musicModel.create({
-        title,
-        uri: result.url,
-        artist: decoded.id
-    })
-
-    res.status(201).json({
-        message: "music created successfully",
-        music:{
-            title: music.title,
-            uri: music.uri,
-            artist: music.artist
-        }
-    })
 
 
 }
