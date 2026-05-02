@@ -1,54 +1,49 @@
-const musicModel = require("../models/music.model")
-const {uploadFile} = require("../services/storage.service")
-const jwt = require("jsonwebtoken")
+const musicModel = require('../models/music.moodels')
+const jwt = require('jsonwebtoken')
+const {uploadFile} = require('../services/storage.services')
 
-
-
-async function createMusic(req, res){
-
-    const token = req.cookies.token
-
-    if(!token){
-        return res.status(401).json({
-            message:"unauthorized"
-        })
+async function addMusic(req, res){
+  const token = req.cookies.token
+  if(!token){
+    return res.status(401).json({message: 'Unauthorized'})
+  }
+  try{
+    const decoded = jwt.verify(token, process.env.JWT_SECRET)
+    if(decoded.role !== 'artist'){
+      return res.status(403).json({message: "You don't have access to add music"})
     }
-    try{
-        const decoded = jwt.verify(token, process.env.JWT_SECRET)
+  
+  const{title} = req.body
+  const file = req.file
 
-        if(decoded.role !== "artist"){
-            return res.status(403).json({
-                message: "you don't have access to create a music"
-            })
-        }
-    
-        const {title} = req.body
-        const uri = req.file.path
+  const result = await uploadFile(file.buffer.toString('base64'))
 
-        const result = await uploadFile(file.buffer.toString("base64"))
-
-        const music = await musicModel.create({
-            title,
-            uri: result.url,
-            artist: decoded.id
-        })
-
-        res.status(201).json({
-            message: "music created successfully",
-            music:{
-                title: music.title,
-                uri: music.uri,
-                artist: music.artist
-            }
-        })
+  const music = await musicModel.create({
+    uri: result.url,
+    title,
+    artist: decoded.id
+  })
+  res.status(201).json({
+    message: 'Music added successfully', 
+    music:{
+      id: music._id,
+      uri: music.uri,
+      title: music.title,
+      artist: music.artist
     }
-    catch(err){
-        return res.status(401).json({
-            message: "unauthorized"
-        })
-    }
-
+  })
+  }
+  catch(err){
+    console.log(err)
+    return res.status(401).json({message: 'Unauthorized'})
+  }
 
 }
-module.exports = {createMusic}
+
+
+
+module.exports = { addMusic }
+
+
+
 
