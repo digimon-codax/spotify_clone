@@ -6,7 +6,7 @@ const albumModel = require('../models/album.models')
 async function addMusic(req, res){
   
   
-  const{title} = req.body
+  const{title, albumId} = req.body
   const file = req.file
 
   const result = await uploadFile(file.buffer.toString('base64'))
@@ -16,6 +16,11 @@ async function addMusic(req, res){
     title,
     artist: req.user.id
   })
+
+  if (albumId) {
+    await albumModel.findByIdAndUpdate(albumId, { $push: { musics: music._id } })
+  }
+
   res.status(201).json({
     message: 'Music added successfully', 
     music:{
