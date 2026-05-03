@@ -1,6 +1,7 @@
 const musicModel = require('../models/music.moodels')
 const jwt = require('jsonwebtoken')
 const {uploadFile} = require('../services/storage.services')
+const albumModel = require('../models/album.models')
 
 async function addMusic(req, res){
   const token = req.cookies.token
