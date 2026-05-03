@@ -51,7 +51,15 @@ async function addMusicToAlbum(req, res){
   
 }
 
-module.exports = { addMusic, addMusicToAlbum }
+async function getAllMusics(req, res){
+  const musics = await musicModel.find()
+  res.status(200).json({
+    message: 'Musics retrieved successfully',
+    musics: musics
+  })
+}
+
+module.exports = { addMusic, addMusicToAlbum, getAllMusics} 
 
 
 
