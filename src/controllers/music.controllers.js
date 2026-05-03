@@ -41,9 +41,42 @@ async function addMusic(req, res){
 
 }
 
+async function addMusicToAlbum(req, res){
+  const token = req.cookies.token
 
+  if(!token){
+    return res.status(401).json({message: 'Unauthorized'})
+  }
+  try{
+    const decoded = jwt.verify(token, process.env.JWT_SECRET)
 
-module.exports = { addMusic }
+    if(decoded.role !== 'artist'){
+      return res.status(403).json({message: "You don't have access to add music to an album"})
+    }
+
+    const {title, musicIds} = req.body
+    const album = await albumModel.create({
+      title,
+      artist: decoded.id,
+      musics: musicIds
+    })
+
+    res.status(201).json({
+      message: 'Album created successfully',
+      album:{
+        id: album._id,
+        title: album.title,
+        artist: album.artist,
+        musics: album.musics
+      }
+    })
+  }catch(err){
+    console.log(err)
+    return res.status(401).json({message: "Unauthorized"})
+  }
+}
+
+module.exports = { addMusic, addMusicToAlbum }
 
 
 
