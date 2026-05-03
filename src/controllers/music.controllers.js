@@ -4,15 +4,7 @@ const {uploadFile} = require('../services/storage.services')
 const albumModel = require('../models/album.models')
 
 async function addMusic(req, res){
-  const token = req.cookies.token
-  if(!token){
-    return res.status(401).json({message: 'Unauthorized'})
-  }
-  try{
-    const decoded = jwt.verify(token, process.env.JWT_SECRET)
-    if(decoded.role !== 'artist'){
-      return res.status(403).json({message: "You don't have access to add music"})
-    }
+  
   
   const{title} = req.body
   const file = req.file
@@ -33,11 +25,7 @@ async function addMusic(req, res){
       artist: music.artist
     }
   })
-  }
-  catch(err){
-    console.log(err)
-    return res.status(401).json({message: 'Unauthorized'})
-  }
+  
 
 }
 
