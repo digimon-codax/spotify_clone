@@ -14,7 +14,7 @@ async function addMusic(req, res){
   const music = await musicModel.create({
     uri: result.url,
     title,
-    artist: decoded.id
+    artist: req.user.id
   })
   res.status(201).json({
     message: 'Music added successfully', 
@@ -35,7 +35,7 @@ async function addMusicToAlbum(req, res){
     const {title, musicIds} = req.body
     const album = await albumModel.create({
       title,
-      artist: decoded.id,
+      artist: req.user.id,
       musics: musicIds
     })
 
