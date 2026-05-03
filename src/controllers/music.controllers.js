@@ -59,7 +59,12 @@ async function getAllMusics(req, res){
   })
 }
 
-module.exports = { addMusic, addMusicToAlbum, getAllMusics} 
+async function getAllAlbums(req, res){
+  const albums = await albumModel.find().populate('artist', 'username').populate('musics', 'title')
+  res.status(200).json({message: 'Albums retrieved successfully', albums: albums})
+}
+
+module.exports = { addMusic, addMusicToAlbum, getAllMusics, getAllAlbums} 
 
 
 
